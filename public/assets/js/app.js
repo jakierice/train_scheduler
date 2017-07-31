@@ -3,7 +3,8 @@ $(document).foundation();
 var db = firebase.database();
 
 $('#addTrainButton').click(function () {
-    $('#addTrainForm').show('slow');
+    // $('#addTrainForm').show('slow');
+    $('#addTrainForm').toggle('slow');
 })
 
 $('#addTrainSubmit').click(function (e) {
@@ -29,24 +30,41 @@ $('#addTrainSubmit').click(function (e) {
     }
 })
 
-db.ref('/trains').on('child_added', function (train) {
+db.ref('/trains').orderByChild('name').on('child_added', function (train) {
     var trainInfo = train.toJSON();
     // console.log(trainInfo);
 
-    var trainCard = $('<div>');
+    var trainCard = $('<div id="' + train.key + '" ontouchstart="this.classList.toggle("hover");">');
+    var trainCardInner = $('<div>');
+    var trainCardFront = $('<div>');
+    var trainCardBack = $('<div>');
     var trainStatus = $('<h5>').attr('id', train.key + 'Status');
     var trainNext = $('<h5>').attr('id', train.key + 'Next');
 
-    trainCard.addClass('small-12 medium-4 large-3 cell trainCard')
+    trainCard.addClass('small-12 medium-4 large-3 cell trainCard flip-card')
+
+    trainCardFront.addClass('flip-card-inner-front')
+        .append('<span><h3>' + trainInfo.name + '</h3> <h6>to</h6> <h4>' + trainInfo.destination + '</h4></span>')
         .attr('data-key', train.key);
 
-    trainCard.append('<h3>' + trainInfo.name + '</h3>')
+    trainCardBack.addClass('flip-card-inner-back')
         .append('<h4>' + trainInfo.destination + '</h4>')
         .append('<h6>Runs every ' + trainInfo.frequency + ' minutes</h6>')
         .append(trainStatus)
         .append(trainNext)
+        .append('<button type="button" class="button">Remove</button>')
+
+    trainCardInner.addClass('flip-card-inner')
+        .append(trainCardFront)
+        .append(trainCardBack)
+
+    trainCard
+        .append(trainCardInner);
 
     $('#trains').append(trainCard);
+    $('#trains').animate({
+        opacity: 1.0
+    }, 800);
 })
 
 function trainTime() {
@@ -57,36 +75,39 @@ function trainTime() {
 
         // First Time (pushed back 1 year to make sure it comes before current time)
         var firstTimeConverted = moment(trainInfo.time, "hh:mm").subtract(1, "years");
-        // console.log(firstTimeConverted);
         // Current Time
         var currentTime = moment();
-        // console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
         // Difference between the times
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-        // console.log("DIFFERENCE IN TIME: " + diffTime);
         // Time apart (remainder)
         var tRemainder = diffTime % trainInfo.frequency;
-        // console.log(tRemainder);
         // Minute Until Train
-        var updatetMinutesTillTrain = trainInfo.frequency - tRemainder;
-        // console.log("MINUTES TILL TRAIN: " + updatetMinutesTillTrain);
+        var nextTrain = trainInfo.frequency - tRemainder;
         // Next Train
-        var updatenextTrain = moment().add(updatetMinutesTillTrain, "minutes").format("hh:mm A");
-        // console.log("ARRIVAL TIME: " + updatenextTrain);
+        var updateNextTrain = moment().add(nextTrain, "minutes").format("hh:mm A");
 
         // Update train status based on remaining time till next train
         var status = "On Time";
 
-        if (updatetMinutesTillTrain > 2 && updatetMinutesTillTrain < 10) {
-            status = "All Aboard";
-        } else if (updatetMinutesTillTrain > 1 && updatetMinutesTillTrain < 3) {
+        if (nextTrain > 2 && nextTrain < 10) {
+            status = "Now Boarding";
+            $('#' + train.key + 'Status').css('color', '#009FB7');
+            $('#' + train.key).css('border', '4px solid #009FB7');
+        } else if (nextTrain > 1 && nextTrain < 3) {
             status = "Final Boarding";
-        } else if (updatetMinutesTillTrain < 2) {
+            $('#' + train.key + 'Status').css('color', '#FDE95C');
+            $('#' + train.key).css('border', '4px solid #FDE95C');
+        } else if (nextTrain < 2) {
             status = "Departing";
+            $('#' + train.key + 'Status').css('color', '#FB4D3D');
+            $('#' + train.key).css('border', '4px solid #FB4D3D');
+        } else {
+            $('#' + train.key + 'Status').css('color', 'white');
+            $('#' + train.key).css('border', '3px solid white');
         };
 
         $('#' + train.key + 'Status').html(status);
-        $('#' + train.key + 'Next').html('Next Train in: ' + updatetMinutesTillTrain + ' minutes');
+        $('#' + train.key + 'Next').html('Departs in ' + nextTrain + ' minutes');
     });
 }
 
