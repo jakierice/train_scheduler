@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Train Scheduler</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="assets/css/foundation.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+
+<div class="grid-container grid-container-padded" id="main">
+  <div class="grid-x grid-margin-x grid-margin-y" id="trains">
+  </div>
+
+  <div class="grid-x grid-margin-x grid-margin-y">
+    <div class="small-12 cell">
+      <button type="button" class="button" id="addTrainButton">Add Train</button>
+    </div>
+  </div>
+
+  <div class="grid-x" id="addTrainForm">
+    <div class="small-12 cell">
+      <form>
+        <div class="grid-x grid-margin-x">
+          <div class="medium-6 cell">
+            <label>Train Name</label>
+            <input type="text" placeholder="Example Train" id="trainName">
+          </div>
+          <div class="medium-6 cell">
+            <label>Destination</label>
+            <input type="text" placeholder="Harrisburg" id="trainDestination">
+          </div>
+          <div class="medium-6 cell">
+            <label>First Train Time (HH:mm - 24 Hour Clock)</label>
+            <input type="time" placeholder="16:25" id="trainTime">
+          </div>
+          <div class="medium-6 cell">
+            <label>Frequency (min)</label>
+            <input type="number" placeholder="25" id="trainFrequency">
+          </div>
+        </div>
+        <div class="small-12 cell align-right">
+          <button type="submit" class="button" id="addTrainSubmit" data-close>Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/4.2.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyABpgc-3uVoIK2Z456MHZt4jKsQBarTfYs",
+    authDomain: "trainscheduler-b7641.firebaseapp.com",
+    databaseURL: "https://trainscheduler-b7641.firebaseio.com",
+    projectId: "trainscheduler-b7641",
+    storageBucket: "trainscheduler-b7641.appspot.com",
+    messagingSenderId: "984996276515"
+  };
+  firebase.initializeApp(config);
+
+</script>
+
+<script src="assets/js/vendor/jquery.js"></script>
+<script src="assets/js/vendor/foundation.min.js"></script>
+<script src="assets/js/vendor/moment.js"></script>
+
+<script src="assets/js/app.js"></script>
+</body>
+
+</html>
